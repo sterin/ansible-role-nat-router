@@ -5,6 +5,7 @@
   with_items:
     - dnsmasq
     - netfilter-persistent
+    - iptables-persistent
 
 - name: NAT
   iptables:
@@ -33,6 +34,17 @@
     chain: POSTROUTING
     flush: yes
   notify: persist iptables
+
+- name: Port forwards
+  iptables:
+    table: nat
+    action: append
+    chain: PREROUTING
+    protocol: "{{ item.protocol }}"
+    destination_port: "{{ item.port }}"
+    jump: DNAT
+    to_destination: "{{ item.destination }}"
+  with_items: "{{ port_forwards }}"
 
 - name: Add NAT rules
   iptables:

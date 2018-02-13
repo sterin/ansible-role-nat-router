@@ -28,6 +28,10 @@ IP address range used by the internal DHCP server.
 
 List of pairs of MAC address and IP address to allocate statically.
 
+    port_forwards: []
+
+List of port forwards.
+
 ## Example Playbook
 
 ```yaml
@@ -44,6 +48,13 @@ List of pairs of MAC address and IP address to allocate statically.
           fixed_leases:
             - ["66-40-3B-5E-06-F0", "192.168.1.100"]
             - ["42-A8-CE-A1-BE-9D", "192.168.1.101"]
+          port_forwards:
+            - port: 8079
+              protocol: tcp
+              destination: 192.168.0.100:80
+            - port: 8078
+              protocol: tcp
+              destination: 192.168.0.101:81
 ```
 
 ## License

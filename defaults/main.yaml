@@ -9,3 +9,5 @@ fixed_leases: []
 
 lease_period: 72h
 
+port_forwards: []
+
