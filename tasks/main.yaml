@@ -1,0 +1,61 @@
+---
+- name: Install tools
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - dnsmasq
+    - netfilter-persistent
+
+- name: NAT
+  iptables:
+    action: append
+    chain: FORWARD
+    in_interface: "{{ lan_interface }}"
+    out_interface: "{{ wan_interface }}"
+    source: "{{ lan_ip_range }}"
+    match: conntrack
+    ctstate: NEW
+    jump: ACCEPT
+  notify: persist iptables
+    
+- name: NAT
+  iptables:
+    action: append
+    chain: FORWARD
+    match: conntrack
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+  notify: persist iptables
+
+- name: Flush nat rules
+  iptables:
+    table: nat
+    chain: POSTROUTING
+    flush: yes
+  notify: persist iptables
+
+- name: Add NAT rules
+  iptables:
+    table: nat
+    action: append
+    chain: POSTROUTING
+    out_interface: "{{ wan_interface }}"
+    jump: MASQUERADE
+  notify: persist iptables
+
+- name: Enable forwarding now
+  copy:
+    content: "1\n"
+    dest: /proc/sys/net/ipv4/ip_forward
+
+- name: Enable forwarding after reboot
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+
+- name: configure dnsmasq
+  template:
+    src: dnsmasq.conf.j2
+    dest: /etc/dnsmasq.d/{{ lan_interface }}
+  notify: restart dnsmasq

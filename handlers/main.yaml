@@ -1,0 +1,13 @@
+---
+- name: restart dnsmasq
+  service:
+    name: dnsmasq
+    state: restarted
+
+- name: save iptables
+  shell: netfilter-persistent save
+  listen: persist iptables
+
+- name: reload iptables
+  shell: netfilter-persistent reload
+  listen: persist iptables

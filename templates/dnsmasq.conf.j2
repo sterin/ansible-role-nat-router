@@ -1,0 +1,6 @@
+interface={{ lan_interface }}
+dhcp-range={{ dhcp_range }},{{ lease_period }} 
+
+{% for mac, ip in fixed_leases %}
+dhcp-host={{ mac }},{{ ip }}
+{% endfor %}
