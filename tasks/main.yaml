@@ -55,15 +55,10 @@
     jump: MASQUERADE
   notify: persist iptables
 
-- name: Enable forwarding now
-  copy:
-    content: "1\n"
-    dest: /proc/sys/net/ipv4/ip_forward
-
 - name: Enable forwarding after reboot
   sysctl:
     name: net.ipv4.ip_forward
-    value: 1
+    value: "1"
     sysctl_set: yes
 
 - name: configure dnsmasq
